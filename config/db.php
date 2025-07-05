@@ -17,5 +17,24 @@ function UserDetail()
 if (isset($_SESSION['email'])) {
     $USERDETAIL = UserDetail();
 
+
+
 }
+
+$totalAppointments = $connect->query("SELECT COUNT(*) as total FROM appointments")->fetch_assoc()['total'];
+
+$totalUser = $connect->query("SELECT COUNT(*) as total From users")->fetch_assoc()['total'];
+
+$weekStart = date('Y-m-d', strtotime('monday  this week'));
+$weekEnd = date('Y-m-d', strtotime('sunday this week '));
+
+$query = "select count(*) as total FROM appointments where created_at BETWEEN '$weekStart' AND '$weekEnd'";
+
+$result = mysqli_query($connect, $query);
+$row = mysqli_fetch_array($result);
+$serviceThisWeek = $row['total'] ;
+
+
+
+
 ?>

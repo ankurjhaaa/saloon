@@ -92,7 +92,8 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
 
                         <label
                             class="flex items-center border border-gray-300 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition">
-                            <input type="radio" name="payment_method" value="online" class="accent-pink-600 mr-3" />
+                            <input type="radio" name="payment_method" id="rzp-button" value="online"
+                                class="accent-pink-600 mr-3" />
                             <span class="text-gray-700 font-medium">Online Payment</span>
                         </label>
 
@@ -118,7 +119,7 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
 
                 if ($payment === 'offline') {
                     $insertpaymentquery = $connect->query("UPDATE appointments SET paymentmode = '$payment' WHERE id = '$appoint_id'");
-                    if($insertpaymentquery){
+                    if ($insertpaymentquery) {
                         echo "<script>window.location.href='paymentconfirm.php?appoint_id=$appoint_id';</script>";
                     }
 
@@ -136,6 +137,36 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
 
         </div>
     </section>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        document.getElementById('rzp-button').onclick = function (e) {
+            e.preventDefault();
+
+            var options = {
+                "key": "rzp_test_wMrelPwjtkBE1b"   ,  // ✅ Replace with Ankur bhai ka test key
+                 "amount": 50000, // in paise = ₹500.00
+                "currency": "INR",
+                "name": "Glow & Shine Salon",
+                "description": "Salon Appointment Payment",
+                "handler": function (response) {
+                    // ✅ Jab payment ho jaye
+                    window.location.href = "payment-success.php?payment_id=" + response.razorpay_payment_id;
+                },
+                "prefill": {
+                    "name": "<?= $USERDETAIL['name'] ?? '' ?>",
+                    "email": "<?= $USERDETAIL['email'] ?? '' ?>",
+                    "contact": "<?= $USERDETAIL['phone'] ?? '' ?>"
+                },
+                "theme": {
+                    "color": "#ec4899"
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+    </script>
 
 
 </body>

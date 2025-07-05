@@ -12,10 +12,12 @@
             <li><a href="users.php"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-pink-100 text-gray-700">
                     👤 Manage Users</a></li>
-            <li><a href="services.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-pink-100 text-gray-700">
+            <li><a href="services.php"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-pink-100 text-gray-700">
                     ✂️ Services</a></li>
             <li><a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-pink-100 text-gray-700">
                     📈 Reports</a></li>
+           
         </ul>
     </div>
 </aside>

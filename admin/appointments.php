@@ -30,38 +30,114 @@
                     <h1 class="text-2xl font-bold text-gray-800">All Appointments</h1>
                     <p class="text-gray-600">View and manage all appointments here.</p>
                 </div>
+                <form action="" method="get">
+                    <!-- Filters -->
+                    <div
+                        class="bg-white p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600 block mb-1">Date Range</label>
+                            <input type="date" name="appointdate"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                value="<?php echo $_GET['appointdate'] ?? ''; ?> ">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 block mb-1">Service</label>
+                            <select name="services" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="">All</option>
+                                <?php foreach ($serviceOptions as $service): ?>
+                                    <option value="<?= htmlspecialchars($service) ?>" <?= (isset($_GET['services']) && $_GET['services'] == $service) ? 'selected' : '' ?>>
+                                        <?= ucfirst(htmlspecialchars($service)) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 block mb-1">Status</label>
+                            <select name="status" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                                <option value="">All</option>
+                                <option value="pending" <?= ($_GET['status'] ?? '') == 'pending' ? 'selected' : '' ?>>
+                                    Pending</option>
+                                <option value="completed" <?= ($_GET['status'] ?? '') == 'completed' ? 'selected' : '' ?>>
+                                    Completed</option>
+                                <option value="cancelled" <?= ($_GET['status'] ?? '') == 'cancelled' ? 'selected' : '' ?>>
+                                    Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 block mb-1">Search</label>
+                            <input type="text" name="search" placeholder="Search by name..."
+                                value="<?php echo $_GET['search'] ?? ''; ?>"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                        </div>
 
-                <!-- Filters -->
-                <div class="bg-white p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <label class="text-sm text-gray-600 block mb-1">Date Range</label>
-                        <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+
                     </div>
-                    <div>
-                        <label class="text-sm text-gray-600 block mb-1">Service</label>
-                        <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                            <option>All</option>
-                            <option>Haircut</option>
-                            <option>Facial</option>
-                            <option>Spa</option>
-                            <option>Makeup</option>
-                        </select>
+                    <div class="flex justify-end mb-6">
+                        <button type="submit"
+                            class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 text-sm">
+                            Apply Filters
+                        </button>
                     </div>
-                    <div>
-                        <label class="text-sm text-gray-600 block mb-1">Status</label>
-                        <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                            <option>All</option>
-                            <option>Pending</option>
-                            <option>Completed</option>
-                            <option>Cancelled</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-sm text-gray-600 block mb-1">Search</label>
-                        <input type="text" placeholder="Search by name..."
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                    </div>
-                </div>
+                </form>
+
+                <?php
+                $condition = "WHERE 1=1";
+
+                if (!empty($_GET['appointdate'])) {
+                    $date = mysqli_real_escape_string($connect, $_GET['appointdate']);
+                    $condition .= " AND appointdate = '$date'";
+                }
+
+                if (!empty($_GET['services'])) {
+                    $service = mysqli_real_escape_string($connect, $_GET['services']);
+                    $condition .= " AND appointservice = '$service'";
+                }
+
+                if (!empty($_GET['status'])) {
+                    $status = mysqli_real_escape_string($connect, $_GET['status']);
+                    $condition .= " AND status = '$status'";
+                }
+
+                if (!empty($_GET['search'])) {
+                    $search = mysqli_real_escape_string($connect, $_GET['search']);
+                    $condition .= " AND users.name LIKE '%$search%'";
+                }
+
+                $query = "
+                         SELECT appointments.*, users.name as username
+                         FROM appointments
+                         JOIN users ON appointments.userid = users.id
+                         $condition
+                         ORDER BY appointments.id DESC
+                     ";
+
+                $result = mysqli_query($connect, $query);
+
+
+
+
+
+                ?>
+                <?php
+
+
+                $query = "SELECT appointments.*, users.name AS username 
+                FROM appointments 
+                JOIN users ON appointments.userid = users.id";
+                $result = mysqli_query($connect, $query)
+
+
+
+
+
+
+
+
+
+
+
+
+                    ?>
 
                 <!-- Appointments Table -->
                 <div class="bg-white rounded-lg shadow overflow-x-auto">
@@ -77,46 +153,46 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 font-medium">Riya Mehta</td>
-                                <td class="px-6 py-4">Haircut</td>
-                                <td class="px-6 py-4">2025-07-05</td>
-                                <td class="px-6 py-4">10:30 AM</td>
-                                <td class="px-6 py-4 text-yellow-500 font-semibold">Pending</td>
-                                <td class="px-6 py-4 text-center space-x-2">
-                                    <button
-                                        class="text-sm px-3 py-1 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200">View</button>
-                                    <button
-                                        class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200">Cancel</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 font-medium">Anjali Verma</td>
-                                <td class="px-6 py-4">Facial</td>
-                                <td class="px-6 py-4">2025-07-06</td>
-                                <td class="px-6 py-4">2:00 PM</td>
-                                <td class="px-6 py-4 text-green-600 font-semibold">Completed</td>
-                                <td class="px-6 py-4 text-center space-x-2">
-                                    <button
-                                        class="text-sm px-3 py-1 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200">View</button>
-                                    <button
-                                        class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200">Cancel</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 font-medium">Sneha Roy</td>
-                                <td class="px-6 py-4">Spa</td>
-                                <td class="px-6 py-4">2025-07-07</td>
-                                <td class="px-6 py-4">12:15 PM</td>
-                                <td class="px-6 py-4 text-red-500 font-semibold">Cancelled</td>
-                                <td class="px-6 py-4 text-center space-x-2">
-                                    <button
-                                        class="text-sm px-3 py-1 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200">View</button>
-                                    <button
-                                        class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200">Cancel</button>
-                                </td>
-                            </tr>
+                            <?php if (mysqli_num_rows($result) > 0) { ?>
+                                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 font-medium"><?= $row['username'] ?></td>
+                                        <td class="px-6 py-4"><?= $row['appointservice'] ?></td>
+                                        <td class="px-6 py-4"><?= date('d-m-Y', strtotime($row['appointdate'])) ?></td>
+                                        <td class="px-6 py-4"><?= date('H:i A', strtotime($row['appointslot'])) ?></td>
+
+                                        <?php
+                                        $statusClass = ($row['status'] == 'completed') ? 'text-green-600' :
+                                            (($row['status'] == 'cancelled') ? 'text-red-500' : 'text-yellow-500');
+                                        ?>
+                                        <td class="px-6 py-4 font-semibold <?= $statusClass ?>">
+                                            <?= ucfirst($row['status']); ?>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-center space-x-2">
+                                            <a href="appointmentview.php?id=<?= $row['id']; ?>"
+                                                class="text-sm px-3 py-1 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200">View</a>
+                                            <?php if ($row['status'] != 'completed') { ?>
+                                                <a href="mark_completed.php?id=<?= $row['id']; ?>"
+                                                    onclick="return confirm('Mark this appointment as completed?')"
+                                                    class="text-sm px-3 py-1 bg-green-100 text-green-700 rounded-full hover:bg-green-200">Complete</a>
+                                            <?php } ?>
+
+                                            <?php if ($row['status'] != 'cancelled') { ?>
+                                                <a href="cancel_appointment.php?id=<?= $row['id']; ?>"
+                                                    onclick="return confirm('Cancel this appointment?')"
+                                                    class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200">Cancel</a>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No appointments found.</td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
+
                     </table>
                 </div>
             </main>

@@ -1,5 +1,14 @@
 <?php include_once('config/db.php') ?>
 <?php
+
+if (!isset($_SESSION['email'])) {
+    header("Location: index.php#login");
+    exit;
+}
+?>
+
+
+<?php
 if (isset($_GET['date'])) {
     $date = $_GET['date'];
     // Convert GET date from d-m-Y to Y-m-d for comparison
@@ -43,7 +52,7 @@ if (isset($_GET['date'])) {
 
     <?php include_once('includes/navbar.php') ?>
 
-    <section class="bg-white py-16 px-4 md:px-20">
+    <section class="bg-white mt-3 py-16 px-4 md:px-20">
         <div class="max-w-4xl mx-auto bg-pink-50 rounded-xl shadow-lg p-8 md:p-12">
             <h2 class="text-3xl font-bold text-center text-pink-600 mb-8">Book Your Appointment</h2>
 
