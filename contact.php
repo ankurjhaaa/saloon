@@ -19,7 +19,7 @@
     <h2 class="text-4xl font-bold mb-4">Want To Pamper Yourself?</h2>
     <p class="text-white/90 text-sm md:text-base mb-6">Book your appointment online in seconds. For queries or collaboration, feel free to message us below.</p>
     <div class="flex justify-center">
-      <a href="booking.php" class="bg-white text-pink-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg">Book Appointment</a>
+      <a href="booking.php?date=<?= date('d-m-Y'); ?>" class="bg-white text-pink-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg">Book Appointment</a>
     </div>
   </div>
 </section>

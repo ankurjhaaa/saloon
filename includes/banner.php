@@ -1,6 +1,6 @@
 <!-- Hero Banner -->
 <section class="relative bg-cover bg-center bg-no-repeat h-[100vh] text-white pt-20"
-    style="background-image: url('https://picsum.photos/seed/salonbg/1600/900');">
+    style="background-image: url('images/pngtree-salon-with-barber-chair-in-dark-hallway-picture-image_2599846.jpg');">
 
     <!-- Dark Overlay -->
     <div class="absolute inset-0 bg-gradient-to-tr from-black via-black/60 to-transparent"></div>
@@ -22,7 +22,7 @@
 
             <!-- Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-up delay-300">
-                <a href="#book"
+                <a href="booking.php?date=<?= date('d-m-Y'); ?>"
                     class="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-full text-white font-semibold text-sm shadow-lg transition">Book
                     Appointment</a>
                 <a href="#services"
@@ -37,7 +37,7 @@
         <div class="md:w-1/2 flex items-center justify-center">
             <div class="w-full max-w-md rounded-lg overflow-hidden shadow-lg border border-white/20">
                 <img id="carouselImage" class="w-full h-64 object-cover transition duration-500"
-                    src="https://picsum.photos/seed/salon1/600/400" alt="Salon Carousel" />
+                    src="images/pngtree-bearded-hipster-confidently-styled-by-skilled-barber-in-barbershop-and-mens-beauty-salon-advertisement-photo-image_45814958.jpg" alt="Salon Carousel" />
             </div>
         </div>
     </div>
@@ -97,7 +97,7 @@
                 i = (i + 1) % words.length;
             }
         }
-        setTimeout(typeEffect, isDeleting ? 50 : 150);
+        setTimeout(typeEffect, isDeleting ? 150 : 250);
     }
 
     document.addEventListener("DOMContentLoaded", typeEffect);
@@ -106,10 +106,10 @@
 <!-- Carousel Script -->
 <script>
     const images = [
-        "https://picsum.photos/seed/salon1/600/400",
-        "https://picsum.photos/seed/salon2/600/400",
-        "https://picsum.photos/seed/salon3/600/400",
-        "https://picsum.photos/seed/salon4/600/400"
+        "images/pngtree-bearded-hipster-confidently-styled-by-skilled-barber-in-barbershop-and-mens-beauty-salon-advertisement-photo-image_45814958.jpg",
+        "images/beautiful-young-woman-facial-mask-beauty-salon-girl-getting-treatment-care-beautician-spa-197454753.webp",
+        "images/hq720.jpg",
+        "images/hair-salon-woman-haircut-cutting_141172-1660.avif"
     ];
     let index = 0;
     const img = document.getElementById("carouselImage");

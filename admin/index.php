@@ -76,8 +76,18 @@
                     <div class="bg-white p-5 rounded-xl shadow border-l-4 border-yellow-500">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h2 class="text-sm text-gray-500 font-medium">Monthly Revenue</h2>
-                                <p class="text-2xl font-bold text-gray-800 mt-1">₹86,400</p>
+                                <h2 class="text-sm text-gray-500 font-medium">This Month Revenue</h2>
+                                <?php
+                                // Get date 1 month ago from today
+                                $oneMonthAgo = date('Y-m-d', strtotime('-1 month'));
+                                // Query to sum all amount entries in the last 1 month
+                                $query = $connect->query("SELECT SUM(amount) AS total_amount FROM revenue WHERE created_at >= '$oneMonthAgo'");
+                                $result = $query->fetch_assoc();
+                                // If no result, default to 0
+                                $totalRevenue = $result['total_amount'] ?? 0;
+                                // Show total                                ?>
+
+                                <p class="text-2xl font-bold text-gray-800 mt-1">₹<?= $totalRevenue ?></p>
                             </div>
                             <div class="text-yellow-500">
                                 <i class="fas fa-rupee-sign text-2xl"></i>
@@ -91,9 +101,6 @@
           FROM appointments 
           JOIN users ON appointments.userid = users.id";
                 $result = mysqli_query($connect, $query)
-
-
-
 
                     ?>
                 <?php if (isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
@@ -129,7 +136,8 @@
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-gray-800">Recent Appointments</h2>
-                        <a href="#" class="text-sm text-pink-600 hover:underline font-medium">View All</a>
+                        <a href="appointments.php" class="text-sm text-pink-600 hover:underline font-medium">View
+                            All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
@@ -154,11 +162,22 @@
                                         <td class="px-4 py-3"><?= ($row['appointslot']); ?></td>
                                         <td class="px-4 py-3 text-center">
                                             <div class="flex justify-center space-x-2">
-                                                <?php if ($row['status'] != 'completed') { ?>
+                                                <?php if ($row['status'] == 'approve') { ?>
                                                     <a href="mark_completed.php?id=<?php echo $row['id']; ?>"
                                                         onclick="return confirm('Mark this appointment as completed?')"
                                                         class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs hover:bg-green-200">
                                                         Complete
+                                                    </a>
+                                                <?php } elseif ($row['status'] == 'cancelled') { ?>
+                                                    <a
+                                                        class="bg-red-100 text-red-600 px-3 py-1 rounded-md text-xs hover:bg-red-200">
+                                                        Cancellled
+                                                    </a>
+                                                <?php } elseif ($row['status'] == 'pending') { ?>
+                                                    <a href="mark_approve.php?id=<?php echo $row['id']; ?>"
+                                                        onclick="return confirm('Mark this appointment as Approve?')"
+                                                        class="bg-yellow-100 text-red-700 px-3 py-1 rounded-full text-xs hover:bg-yellow-200">
+                                                        Approve
                                                     </a>
                                                 <?php } ?>
 
@@ -208,20 +227,7 @@
                     } else {
                         echo "Error deleting appointment.";
                     }
-
-
-
-
-
-
-
-
                 }
-
-
-
-
-
                 ?>
 
                 <!-- Revenue Chart (Static Dummy Block) -->
@@ -252,63 +258,105 @@
                         </li>
                     </ol>
                 </div>
-
-
             </main>
-
-
-
 
         </div>
     </div>
 
 
+    <?php
+    // Set timezone
+    date_default_timezone_set('Asia/Kolkata');
 
-<script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const revenueChart = new Chart(ctx, {
-        type: 'line', // you can also use 'bar'
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // months
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: [15000, 22000, 18000, 24000, 26000, 30000], // dummy values
-                backgroundColor: 'rgba(236, 72, 153, 0.2)',
-                borderColor: 'rgba(236, 72, 153, 1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#ec4899'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#374151',
-                        font: {
-                            weight: 'bold'
+    // === 🟢 Current Month ===
+    $currentMonth = date('M'); // e.g. "Jul"
+    $currentMonthStart = date('Y-m-01');
+    $currentMonthEnd = date('Y-m-t');
+
+    $queryCurrent = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$currentMonthStart' AND '$currentMonthEnd'");
+    $currentTotal = $queryCurrent->fetch_assoc()['total'] ?? 0;
+
+    // === 🟡 1 Month Ago ===
+    $month1 = date('M', strtotime('-1 month'));
+    $start1 = date('Y-m-01', strtotime('-1 month'));
+    $end1 = date('Y-m-t', strtotime('-1 month'));
+    $q1 = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$start1' AND '$end1'");
+    $total1 = $q1->fetch_assoc()['total'] ?? 0;
+
+    // === 🟠 2 Months Ago ===
+    $month2 = date('M', strtotime('-2 month'));
+    $start2 = date('Y-m-01', strtotime('-2 month'));
+    $end2 = date('Y-m-t', strtotime('-2 month'));
+    $q2 = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$start2' AND '$end2'");
+    $total2 = $q2->fetch_assoc()['total'] ?? 0;
+
+    // === 🔵 3 Months Ago ===
+    $month3 = date('M', strtotime('-3 month'));
+    $start3 = date('Y-m-01', strtotime('-3 month'));
+    $end3 = date('Y-m-t', strtotime('-3 month'));
+    $q3 = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$start3' AND '$end3'");
+    $total3 = $q3->fetch_assoc()['total'] ?? 0;
+
+    // === 🔴 4 Months Ago ===
+    $month4 = date('M', strtotime('-4 month'));
+    $start4 = date('Y-m-01', strtotime('-4 month'));
+    $end4 = date('Y-m-t', strtotime('-4 month'));
+    $q4 = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$start4' AND '$end4'");
+    $total4 = $q4->fetch_assoc()['total'] ?? 0;
+
+    // === 🟤 5 Months Ago ===
+    $month5 = date('M', strtotime('-5 month'));
+    $start5 = date('Y-m-01', strtotime('-5 month'));
+    $end5 = date('Y-m-t', strtotime('-5 month'));
+    $q5 = $connect->query("SELECT SUM(amount) AS total FROM revenue WHERE DATE(created_at) BETWEEN '$start5' AND '$end5'");
+    $total5 = $q5->fetch_assoc()['total'] ?? 0;
+
+    ?>
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'line', // you can also use 'bar'
+            data: {
+                labels: ['<?= $month5 ?>', '<?= $month4 ?>', '<?= $month3 ?>', '<?= $month2 ?>', '<?= $month1 ?>', '<?= $currentMonth ?>'], // months
+                datasets: [{
+                    label: 'Revenue (₹)',
+                    data: [<?= $total5 ?>, <?= $total4 ?>, <?= $total3 ?>, <?= $total2 ?>, <?= $total1 ?>, <?= $currentTotal ?>], // dummy values
+                    backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                    borderColor: 'rgba(236, 72, 153, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ec4899'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#374151',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#6b7280'
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: '#6b7280'
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#6b7280'
-                    }
-                }
             }
-        }
-    });
-</script>
+        });
+    </script>
 
 
 </body>

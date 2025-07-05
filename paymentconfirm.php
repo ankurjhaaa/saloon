@@ -1,9 +1,12 @@
 <?php include_once('config/db.php') ?>
 <?php
 
-if (isset($_GET['appoint_id'])) {
-    $appoint_id = $_GET['appoint_id'];
-    echo $appoint_id;
+if (isset($_GET['offline_appoint_id'])) {
+    $appoint_id = $_GET['offline_appoint_id'];
+} elseif (isset($_GET['online_appoint_id'])) {
+    $appoint_id = $_GET['online_appoint_id'];
+    $payment_id = $_GET['payment_id'];
+    $insertpaymentquery = $connect->query("UPDATE appointments SET paymentmode = '$online' OR status='paid' OR payment_id='$payment_id' WHERE id = '$appoint_id'");
 } else {
     echo "<script>history.back();</script>";
 }

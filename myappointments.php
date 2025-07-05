@@ -23,6 +23,8 @@ $appointmentsQuery = $connect->query("SELECT * FROM appointments WHERE userid = 
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>My Appointments - Glow & Shine</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -31,46 +33,55 @@ $appointmentsQuery = $connect->query("SELECT * FROM appointments WHERE userid = 
 
     <?php include_once('includes/navbar.php'); ?>
 
-    <section class="max-w-5xl mx-auto p-6 mt-10">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">📋 My Appointments</h1>
+    <section class="max-w-4xl mx-auto px-4 py-8 mt-14">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">📋 My Appointments</h1>
 
         <?php if ($appointmentsQuery->num_rows > 0): ?>
-            <div class="grid grid-cols-1 gap-6">
+            <div class="space-y-6">
                 <?php while ($appoint = $appointmentsQuery->fetch_assoc()): ?>
-                    <div class="bg-white rounded-xl shadow-md p-6 border border-pink-100 hover:shadow-lg transition">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white border border-pink-200 rounded-xl p-5 shadow-sm hover:shadow-md transition">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <p class="text-sm text-gray-500">Service</p>
-                                <p class="text-lg font-semibold text-pink-600"><?= $appoint['appointservice']; ?></p>
+                                <p class="text-gray-500">Service</p>
+                                <p class="text-pink-600 font-semibold text-base"><?= $appoint['appointservice']; ?></p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Date</p>
-                                <p class="font-medium text-gray-700"><?= $appoint['appointdate']; ?></p>
+                                <p class="text-gray-500">Date</p>
+                                <p class="text-gray-700 font-medium"><?= $appoint['appointdate']; ?></p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Time</p>
-                                <p class="font-medium text-gray-700"><?= $appoint['appointslot']; ?></p>
+                                <p class="text-gray-500">Time</p>
+                                <p class="text-gray-700 font-medium"><?= $appoint['appointslot']; ?></p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Status</p>
-                                <span class="inline-block px-3 py-1 rounded-full text-white text-sm font-semibold
-                                    <?php
-                                        echo $appoint['status'] == 'Pending' ? 'bg-yellow-500' :
-                                            ($appoint['status'] == 'Paid' || $appoint['status'] == 'Completed' ? 'bg-green-500' : 'bg-red-500');
-                                    ?>">
+                                <p class="text-gray-500">Status</p>
+                                <span class="inline-block mt-1 px-3 py-1 rounded-full text-white text-xs font-semibold
+                                <?php
+                                echo $appoint['status'] == 'pending' ? 'bg-red-500' :
+                                    ($appoint['status'] == 'approve' || $appoint['status'] == 'Completed' ? 'bg-yellow-500' : 'bg-red-500');
+                                ?>">
                                     <?= ucfirst($appoint['status']); ?>
                                 </span>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Payment ID</p>
-                                <p class="font-medium text-gray-700"><?= $appoint['payment_id'] ?: 'N/A'; ?></p>
+                                <p class="text-gray-500">Is Paid</p>
+                                <span class="inline-block mt-1 px-3 py-1 rounded-full text-white text-xs font-semibold
+                                <?php
+                                echo ($appoint['ispaid'] == 'Paid' ? 'bg-red-500' : 'bg-green-500');
+                                ?>">
+                                    <?= ucfirst($appoint['ispaid']); ?>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Payment ID</p>
+                                <p class="text-gray-700 font-medium"><?= $appoint['payment_id'] ?: 'N.A.'; ?></p>
                             </div>
                         </div>
                     </div>
                 <?php endwhile; ?>
             </div>
         <?php else: ?>
-            <p class="text-center text-gray-600 mt-10">😕 You have no appointments yet.</p>
+            <p class="text-center text-gray-500 mt-10">😕 You have no appointments yet.</p>
         <?php endif; ?>
 
         <!-- Back to Home -->
@@ -82,5 +93,8 @@ $appointmentsQuery = $connect->query("SELECT * FROM appointments WHERE userid = 
         </div>
     </section>
 
+
+
 </body>
+
 </html>

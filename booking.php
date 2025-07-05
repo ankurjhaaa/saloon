@@ -147,7 +147,7 @@ if (isset($_GET['date'])) {
                 }
 
                 // 2. Prevent Duplicate Booking (same user + date + slot)
-                $check = $connect->prepare("SELECT id FROM appointments WHERE userid=? AND appointdate=? AND appointslot=?");
+                $check = $connect->prepare("SELECT id FROM appointments WHERE userid=? AND appointdate=? AND appointslot=? AND status != 'cancelled'");
                 $check->bind_param("sss", $userid, $appointdate, $appointslot);
                 $check->execute();
                 $check->store_result();
@@ -219,7 +219,7 @@ if (isset($_GET['date'])) {
 
             // Get already booked slots for this date
             $bookedSlots = [];
-            $query = $connect->prepare("SELECT appointslot FROM appointments WHERE appointdate = ?");
+            $query = $connect->prepare("SELECT appointslot FROM appointments WHERE appointdate = ? AND status != 'cancelled'");
             $query->bind_param("s", $selectedDate);
             $query->execute();
             $result = $query->get_result();

@@ -78,7 +78,7 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
             <!-- Divider -->
             <hr class="my-8 border-pink-200" />
 
-            <form action="" method="post">
+            <form action="" method="post" id="payment-form">
                 <!-- Payment Options -->
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">Select Payment Method</h3>
@@ -92,27 +92,25 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
 
                         <label
                             class="flex items-center border border-gray-300 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition">
-                            <input type="radio" name="payment_method" id="rzp-button" value="online"
-                                class="accent-pink-600 mr-3" />
+                            <input type="radio" name="payment_method" value="online" class="accent-pink-600 mr-3" />
                             <span class="text-gray-700 font-medium">Online Payment</span>
                         </label>
-
-
                     </div>
                 </div>
 
                 <div class="mt-10 flex justify-between items-center">
-                    <button
+                    <button type="button"
                         class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-8 py-3 rounded-full shadow-sm transition">
                         Cancel
                     </button>
 
-                    <button type="submit" name="payment"
+                    <button type="submit" name="payment" id="submit-btn"
                         class="bg-pink-600 hover:bg-pink-700 text-white font-semibold px-8 py-3 rounded-full shadow-md transition">
                         Proceed to Confirm
                     </button>
                 </div>
             </form>
+
             <?php
             if (isset($_POST['payment'])) {
                 $payment = $_POST['payment_method'];
@@ -120,53 +118,56 @@ $appointserviceiddetail = $appointserviceidquery->fetch_assoc();
                 if ($payment === 'offline') {
                     $insertpaymentquery = $connect->query("UPDATE appointments SET paymentmode = '$payment' WHERE id = '$appoint_id'");
                     if ($insertpaymentquery) {
-                        echo "<script>window.location.href='paymentconfirm.php?appoint_id=$appoint_id';</script>";
+                        echo "<script>window.location.href='paymentconfirm.php?offline_appoint_id=$appoint_id';</script>";
                     }
 
-
-                } elseif ($payment === 'online') {
-                    // User selected Online Payment
-                    echo "Online payment selected — Redirect to payment gateway.";
-                    // Redirect to Razorpay/Stripe/Instamojo etc.
-                } else {
-                    echo "Invalid payment method.";
                 }
             }
             ?>
 
+            <!-- Razorpay Script -->
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+            <script>
+                document.getElementById("payment-form").addEventListener("submit", function (e) {
+                    const method = document.querySelector('input[name="payment_method"]:checked').value;
+
+                    if (method === 'online') {
+                        e.preventDefault(); // stop form from submitting
+
+                        const options = {
+                            "key": "rzp_test_wMrelPwjtkBE1b", // ✅ Razorpay key
+                            "amount": <?= $appointserviceiddetail['price'] ?> * 100,
+                            "currency": "INR",
+                            "name": "Glow & Shine Salon",
+                            "description": "Salon Appointment Payment",
+                            "handler": function (response) {
+                                console.log(response); // ← Yeh line zaroor daalo
+                                window.location.href = "onlinepaymentsuccess.php?online_appoint_id=<?= $appoint_id ?>&payment_id=" + response.razorpay_payment_id;
+                            }
+                            ,
+                            "prefill": {
+                                "name": "<?= $USERDETAIL['name'] ?? '' ?>",
+                                "email": "<?= $USERDETAIL['email'] ?? '' ?>",
+                                "contact": "<?= $USERDETAIL['phone'] ?? '' ?>"
+                            },
+                            "theme": {
+                                "color": "#ec4899"
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                    }
+                    // else allow normal form submission (offline)
+                });
+            </script>
 
         </div>
     </section>
 
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        document.getElementById('rzp-button').onclick = function (e) {
-            e.preventDefault();
 
-            var options = {
-                "key": "rzp_test_wMrelPwjtkBE1b"   ,  // ✅ Replace with Ankur bhai ka test key
-                 "amount": 50000, // in paise = ₹500.00
-                "currency": "INR",
-                "name": "Glow & Shine Salon",
-                "description": "Salon Appointment Payment",
-                "handler": function (response) {
-                    // ✅ Jab payment ho jaye
-                    window.location.href = "payment-success.php?payment_id=" + response.razorpay_payment_id;
-                },
-                "prefill": {
-                    "name": "<?= $USERDETAIL['name'] ?? '' ?>",
-                    "email": "<?= $USERDETAIL['email'] ?? '' ?>",
-                    "contact": "<?= $USERDETAIL['phone'] ?? '' ?>"
-                },
-                "theme": {
-                    "color": "#ec4899"
-                }
-            };
 
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        }
-    </script>
 
 
 </body>
